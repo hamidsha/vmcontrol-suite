@@ -1,0 +1,56 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: gateway/go.mod
+          cache: false
+      - name: Test
+        working-directory: gateway
+        run: go mod tidy && go test ./...
+      - name: Vet
+        working-directory: gateway
+        run: go vet ./...
+
+  repository-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reject runtime and secret files
+        shell: bash
+        run: |
+          set -euo pipefail
+          forbidden='(^|/)(\.env|vcenters\.json|whmcs-vmcontrol\.php|audit\.jsonl)$|\.(key|pfx|p12|pem|crt|csr)$'
+          if git ls-files | grep -E "$forbidden"; then
+            echo 'A runtime secret, certificate, or audit file is tracked.' >&2
+            exit 1
+          fi
+      - name: Reject private-key material
+        shell: bash
+        run: |
+          set -euo pipefail
+          prefix='BEGIN '
+          suffix='PRIVATE KEY'
+          if git grep -n -E -- "${prefix}(RSA |EC |OPENSSH )?${suffix}"; then
+            echo 'Private-key material is present.' >&2
+            exit 1
+          fi
+
+  whmcs-php72:
+    runs-on: ubuntu-latest
+    container: php:7.2-cli
+    steps:
+      - uses: actions/checkout@v4
+      - name: PHP 7.2 syntax
+        run: find whmcs -name '*.php' -print0 | xargs -0 -n1 php -l

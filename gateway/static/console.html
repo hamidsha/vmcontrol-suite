@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>کنسول سرور</title>
+  <link rel="stylesheet" href="/webmks/wmks-all.css">
+  <link rel="stylesheet" href="/assets/console.css">
+  <script defer src="/webmks/jquery.min.js"></script>
+  <script defer src="/webmks/jquery-ui.min.js"></script>
+  <script defer src="/webmks/wmks.min.js"></script>
+  <script defer src="/assets/console.js"></script>
+</head>
+<body>
+  <header class="console-header">
+    <div class="console-brand">
+      <strong>VMControl</strong>
+      <span>مدیریت سرور مجازی</span>
+    </div>
+    <div class="server-identity">
+      <div>
+        <span class="eyebrow">کنسول تحت وب</span>
+        <strong>{{.DisplayName}}</strong>
+      </div>
+      <div id="connectionBadge" class="connection-badge connecting">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="connectionState">در حال اتصال</span>
+      </div>
+    </div>
+    <div class="console-actions">
+      <button id="powerOn" class="power" type="button">روشن کردن</button>
+      <button id="reboot" type="button">راه‌اندازی مجدد</button>
+      <button id="shutdown" class="danger" type="button">خاموش کردن امن</button>
+      <button id="sendCad" type="button">ارسال Ctrl+Alt+Del</button>
+      <button id="fullscreen" type="button">تمام‌صفحه</button>
+      <button id="disconnect" type="button">بازگشت به پنل</button>
+    </div>
+  </header>
+  <main class="console-main">
+    <div class="console-stage">
+      <div id="notice" role="status">در حال برقراری اتصال امن…</div>
+      <div id="wmksContainer" aria-label="نمایش کنسول ماشین مجازی"></div>
+    </div>
+    <footer class="console-footer">برای بهترین تجربه، از حالت تمام‌صفحه استفاده کنید. نشست کنسول پس از بستن این پنجره خاتمه پیدا می‌کند.</footer>
+  </main>
+</body>
+</html>

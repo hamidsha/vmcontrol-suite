@@ -1,0 +1,50 @@
+services:
+  gateway:
+    build:
+      context: ./gateway
+    image: vmcontrol-gateway:0.5.0
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./secrets/vcenters.json:/run/secrets/vcenters.json:ro
+      - ./webmks:/opt/webmks:ro
+      - ./data:/data
+    expose:
+      - "8080"
+    networks:
+      - backend
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,noexec,nosuid,nodev
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    depends_on:
+      - gateway
+    environment:
+      CONSOLE_DOMAIN: ${CONSOLE_DOMAIN}
+      WHMCS_PUBLIC_IP: ${WHMCS_PUBLIC_IP}
+    ports:
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  caddy_data:
+  caddy_config:

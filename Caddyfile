@@ -1,0 +1,16 @@
+{$CONSOLE_DOMAIN} {
+	encode zstd gzip
+
+	@untrustedApi {
+		path /api/*
+		not remote_ip {$WHMCS_PUBLIC_IP}
+	}
+	respond @untrustedApi "Forbidden" 403
+
+	reverse_proxy gateway:8080
+
+	log {
+		output stdout
+		format json
+	}
+}
